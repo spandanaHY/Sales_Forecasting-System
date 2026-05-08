@@ -1,0 +1,352 @@
+{% extends "base.html" %}
+{% block title %}About — SalesCast{% endblock %}
+{% block body_class %}bg-hero{% endblock %}
+{% block extra_style %}
+<style>
+/* ── HERO ── */
+.about-hero {
+  padding: 2rem 0 3rem;
+  position: relative;
+}
+.status-chip {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  padding: 0.3rem 0.85rem;
+  background: rgba(104,211,145,0.08);
+  border: 1px solid rgba(104,211,145,0.2);
+  border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+  color: #6ee7b7; text-transform: uppercase; letter-spacing: 0.06em;
+  margin-bottom: 1.2rem;
+}
+.status-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #6ee7b7; box-shadow: 0 0 8px #6ee7b7;
+  animation: pulseDot 2s ease-in-out infinite;
+}
+@keyframes pulseDot { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+.hero-cta { display: flex; gap: 0.9rem; flex-wrap: wrap; margin-top: 2rem; }
+
+/* ── STATS STRIP ── */
+.stats-strip {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  overflow: hidden; margin-bottom: 3rem;
+}
+.strip-stat {
+  background: var(--card); padding: 1.6rem 1.4rem;
+  text-align: center; transition: background .2s;
+}
+.strip-stat:hover { background: var(--card2); }
+.strip-val {
+  font-size: 2rem; font-weight: 800; letter-spacing: -0.04em;
+  font-family: var(--mono); margin-bottom: 0.3rem;
+}
+.strip-label { font-size: 0.74rem; color: var(--text-2); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* ── SECTION LABEL ── */
+.sec-label {
+  display: flex; align-items: center; gap: 0.7rem;
+  font-size: 0.72rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--text-2); margin-bottom: 1.2rem;
+}
+.sec-label::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+/* ── METRICS ROW ── */
+.metrics-row {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem;
+  margin-bottom: 3rem;
+}
+.metric-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.4rem;
+  text-align: center; transition: all .22s; position: relative; overflow: hidden;
+}
+.metric-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+}
+.metric-card.blue::before { background: linear-gradient(90deg, transparent, #5eadf7, transparent); }
+.metric-card.violet::before { background: linear-gradient(90deg, transparent, #a78bfa, transparent); }
+.metric-card.teal::before { background: linear-gradient(90deg, transparent, #43d6c8, transparent); }
+.metric-card.amber::before { background: linear-gradient(90deg, transparent, #fbbf24, transparent); }
+.metric-card:hover { border-color: rgba(99,179,237,0.25); transform: translateY(-2px); }
+.metric-val {
+  font-size: 1.5rem; font-weight: 800; font-family: var(--mono);
+  letter-spacing: -0.03em; margin-bottom: 0.3rem;
+}
+.metric-card.blue .metric-val { color: #5eadf7; }
+.metric-card.violet .metric-val { color: #a78bfa; }
+.metric-card.teal .metric-val { color: #43d6c8; }
+.metric-card.amber .metric-val { color: #fbbf24; }
+.metric-tag { font-size: 0.7rem; color: var(--text-2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; }
+.metric-full { font-size: 0.76rem; color: var(--text-3); margin-top: 0.2rem; }
+
+/* ── INFO GRID ── */
+.info-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem;
+  margin-bottom: 3rem;
+}
+.info-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.6rem;
+  transition: all .22s; display: flex; gap: 1rem; align-items: flex-start;
+}
+.info-card:hover { border-color: rgba(99,179,237,0.2); transform: translateY(-2px); }
+.info-card-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.info-card-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.35rem; }
+.info-card-text { font-size: 0.83rem; color: var(--text-2); line-height: 1.6; }
+
+/* ── STEPS TIMELINE ── */
+.steps-row {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem;
+  margin-bottom: 3rem;
+}
+.step-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.4rem;
+  transition: all .22s; position: relative;
+}
+.step-card:hover { border-color: rgba(99,179,237,0.2); transform: translateY(-2px); }
+.step-num {
+  font-size: 2.2rem; font-weight: 900; font-family: var(--mono);
+  letter-spacing: -0.05em; line-height: 1;
+  background: linear-gradient(135deg, rgba(99,179,237,0.35), rgba(159,122,234,0.35));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 0.6rem;
+}
+.step-title { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.35rem; }
+.step-desc { font-size: 0.8rem; color: var(--text-2); line-height: 1.55; }
+
+/* ── TECH STACK ── */
+.tech-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.6rem; margin-bottom: 3rem;
+}
+.tech-title { font-size: 0.9rem; font-weight: 700; margin-bottom: 1rem; }
+.tech-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.tech-chip {
+  display: flex; align-items: center; gap: 0.4rem;
+  padding: 0.35rem 0.85rem;
+  background: rgba(159,122,234,0.07);
+  border: 1px solid rgba(159,122,234,0.2);
+  border-radius: 8px; font-size: 0.8rem;
+  font-weight: 500; color: #c4b5fd;
+  font-family: var(--mono);
+}
+
+@media (max-width:768px) {
+  .stats-strip { grid-template-columns: 1fr 1fr; }
+  .metrics-row { grid-template-columns: 1fr 1fr; }
+  .info-grid { grid-template-columns: 1fr; }
+  .steps-row { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width:480px) {
+  .steps-row { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}
+{% block content %}
+<div class="page">
+<div class="container">
+
+  <!-- HERO -->
+  <!-- Hero decorative SVG art -->
+  <svg style="position:absolute;top:0;right:0;width:500px;height:320px;opacity:0.055;pointer-events:none;overflow:visible;" viewBox="0 0 500 320" xmlns="http://www.w3.org/2000/svg">
+    <polyline points="20,260 70,240 120,225 170,205 220,182 270,158 320,138 370,115 420,95 480,70" fill="none" stroke="#5eadf7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <polyline points="20,280 70,274 120,265 170,256 220,248 270,238 320,225 370,215 420,202 480,190" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5 4"/>
+    <circle cx="270" cy="158" r="5" fill="#5eadf7" opacity="0.8"/>
+    <circle cx="370" cy="115" r="5" fill="#a78bfa" opacity="0.8"/>
+    <circle cx="470" cy="78" r="5" fill="#43d6c8" opacity="0.8"/>
+    <rect x="60" y="220" width="22" height="100" rx="3" fill="rgba(94,173,247,0.3)"/>
+    <rect x="90" y="195" width="22" height="125" rx="3" fill="rgba(167,139,250,0.25)"/>
+    <rect x="120" y="210" width="22" height="110" rx="3" fill="rgba(67,214,200,0.2)"/>
+    <rect x="150" y="182" width="22" height="138" rx="3" fill="rgba(94,173,247,0.28)"/>
+    <rect x="180" y="165" width="22" height="155" rx="3" fill="rgba(167,139,250,0.22)"/>
+    <rect x="210" y="145" width="22" height="175" rx="3" fill="rgba(94,173,247,0.26)"/>
+  </svg>
+  <div class="about-hero fade-up" style="position:relative;">
+    <div class="status-chip">
+      <div class="status-dot"></div>
+      Model Active
+    </div>
+    <div class="page-eyebrow"> Time Series Analysis</div>
+    <h1 class="page-title" style="font-family:var(--font-display);">Sales Forecasting<br/><em>Powered by ARIMA</em></h1>
+    <p class="page-sub" style="max-width:580px;">
+      A machine learning system that analyzes 4 years of retail sales data from the Superstore dataset (2015–2018)
+      to predict future sales trends with confidence intervals and visual analytics.
+    </p>
+    <div class="hero-cta">
+      <a href="/predict" class="btn btn-primary">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Start Forecasting
+      </a>
+      <a href="/graphs" class="btn btn-outline">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><line x1="18" y1="20" x2="18" y2="10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="20" x2="12" y2="4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="6" y1="20" x2="6" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        View Graphs
+      </a>
+    </div>
+  </div>
+
+  <!-- STATS STRIP -->
+  <div class="stats-strip fade-up delay-1">
+    <div class="strip-stat">
+      <div class="strip-val" style="color:#5eadf7;">9,800</div>
+      <div class="strip-label">Dataset Records</div>
+    </div>
+    <div class="strip-stat">
+      <div class="strip-val" style="color:#a78bfa;">4 Yrs</div>
+      <div class="strip-label">Data Range (2015–2018)</div>
+    </div>
+    <div class="strip-stat">
+      <div class="strip-val" style="color:#43d6c8;">ARIMA</div>
+      <div class="strip-label">Forecasting Model</div>
+    </div>
+    <div class="strip-stat">
+      <div class="strip-val" style="color:#fbbf24;">90</div>
+      <div class="strip-label">Max Forecast Days</div>
+    </div>
+  </div>
+
+  <!-- METRICS -->
+  <div class="sec-label fade-up delay-2">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M2 20h.01M7 20v-4M12 20v-8M17 20V8M22 4v16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Model Evaluation Metrics
+  </div>
+  <div class="metrics-row fade-up delay-2">
+    <div class="metric-card blue">
+      <div class="metric-val">{{ metrics.MAE }}</div>
+      <div class="metric-tag">MAE</div>
+      <div class="metric-full">Mean Absolute Error</div>
+    </div>
+    <div class="metric-card violet">
+      <div class="metric-val">{{ metrics.MSE }}</div>
+      <div class="metric-tag">MSE</div>
+      <div class="metric-full">Mean Squared Error</div>
+    </div>
+    <div class="metric-card teal">
+      <div class="metric-val">{{ metrics.RMSE }}</div>
+      <div class="metric-tag">RMSE</div>
+      <div class="metric-full">Root Mean Squared Error</div>
+    </div>
+    <div class="metric-card amber">
+      <div class="metric-val">{{ metrics.MAPE }}%</div>
+      <div class="metric-tag">MAPE</div>
+      <div class="metric-full">Mean Absolute % Error</div>
+    </div>
+  </div>
+
+  <!-- INFO CARDS -->
+  <div class="sec-label fade-up delay-2">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/><line x1="3" y1="9" x2="21" y2="9" stroke="currentColor" stroke-width="2"/><line x1="9" y1="21" x2="9" y2="9" stroke="currentColor" stroke-width="2"/></svg>
+    System Overview
+  </div>
+  <div class="info-grid fade-up delay-3">
+    <div class="info-card">
+      <div class="info-card-icon" style="background:rgba(99,179,237,0.1);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke="#5eadf7" stroke-width="1.8"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" stroke="#5eadf7" stroke-width="1.8"/></svg>
+      </div>
+      <div>
+        <div class="info-card-title">ARIMA Model</div>
+        <div class="info-card-text">ARIMA (AutoRegressive Integrated Moving Average) uses past values and errors to forecast future ones. We use ARIMA(5,1,0) — 5 lag terms, 1 differencing step, optimized for this retail dataset.</div>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-icon" style="background:rgba(104,211,145,0.1);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="#6ee7b7" stroke-width="1.8"/></svg>
+      </div>
+      <div>
+        <div class="info-card-title">Superstore Dataset</div>
+        <div class="info-card-text">Real-world retail data with 9,800 orders across 4 years (2015–2018). Includes Order Date, Category, Region, and Sales amount — aggregated to daily revenue for time series analysis.</div>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-icon" style="background:rgba(159,122,234,0.1);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" stroke="#a78bfa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div>
+        <div class="info-card-title">Forecasting Engine</div>
+        <div class="info-card-text">Choose 7 to 90 days of future predictions. Outputs include total forecasted revenue, daily breakdown, average, peak, and minimum values — all with confidence band visualization.</div>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-icon" style="background:rgba(246,173,85,0.1);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><line x1="18" y1="20" x2="18" y2="10" stroke="#fbbf24" stroke-width="1.8" stroke-linecap="round"/><line x1="12" y1="20" x2="12" y2="4" stroke="#fbbf24" stroke-width="1.8" stroke-linecap="round"/><line x1="6" y1="20" x2="6" y2="14" stroke="#fbbf24" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </div>
+      <div>
+        <div class="info-card-title">Visualizations</div>
+        <div class="info-card-text">6 interactive graphs — daily sales trend, monthly revenue, time series decomposition (trend + seasonality + noise), actual vs predicted, error metrics, and 30-day forecast chart.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEPS -->
+  <div class="sec-label fade-up delay-3">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><polyline points="12 6 12 12 16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    System Pipeline
+  </div>
+  <div class="steps-row fade-up delay-4">
+    <div class="step-card">
+      <div class="step-num">01</div>
+      <div class="step-title">Data Collection</div>
+      <div class="step-desc">Superstore retail CSV loaded with 9,800 sales records spanning 2015–2018</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">02</div>
+      <div class="step-title">Preprocessing</div>
+      <div class="step-desc">Parse dates, aggregate daily sales, handle missing values with forward fill</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">03</div>
+      <div class="step-title">EDA & Graphs</div>
+      <div class="step-desc">Visualize trends, monthly patterns, decomposition into trend + seasonality + residuals</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">04</div>
+      <div class="step-title">Model Training</div>
+      <div class="step-desc">ARIMA(5,1,0) trained on 80% of data, evaluated on 20% with MAE/RMSE metrics</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">05</div>
+      <div class="step-title">Forecasting</div>
+      <div class="step-desc">Generate 7–90 day future predictions with confidence band visualization</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">06</div>
+      <div class="step-title">Output</div>
+      <div class="step-desc">Total, average, peak, and minimum forecasted revenue with day-by-day breakdown table</div>
+    </div>
+  </div>
+
+  <!-- TECH STACK -->
+  <div class="tech-card fade-up delay-4">
+    <div class="sec-label" style="margin-bottom:1rem;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><polyline points="16 18 22 12 16 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="8 6 2 12 8 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Technology Stack
+    </div>
+    <div class="tech-chips">
+      <div class="tech-chip">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#c4b5fd" stroke-width="2"/></svg>
+        Python 3.11
+      </div>
+      <div class="tech-chip">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#c4b5fd" stroke-width="2"/></svg>
+        Flask
+      </div>
+      <div class="tech-chip">Statsmodels (ARIMA)</div>
+      <div class="tech-chip">Pandas</div>
+      <div class="tech-chip">NumPy</div>
+      <div class="tech-chip">Matplotlib</div>
+      <div class="tech-chip">Seaborn</div>
+      <div class="tech-chip">Scikit-learn</div>
+    </div>
+  </div>
+
+</div>
+</div>
+{% endblock %}

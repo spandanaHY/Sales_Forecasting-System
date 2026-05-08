@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+{% block title %}Graphs — SalesCast{% endblock %}
+{% block body_class %}bg-dashboard{% endblock %}
+{% block extra_style %}
+<style>
+/* ── METRICS STRIP ── */
+.metrics-strip {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  overflow: hidden; margin-bottom: 2.5rem;
+}
+.m-cell {
+  background: var(--card); padding: 1.4rem 1.2rem;
+  text-align: center; transition: background .2s; position: relative;
+}
+.m-cell:hover { background: var(--card2); }
+.m-cell::after {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+}
+.m-cell.c1::after { background: linear-gradient(90deg,transparent,#5eadf7,transparent); }
+.m-cell.c2::after { background: linear-gradient(90deg,transparent,#43d6c8,transparent); }
+.m-cell.c3::after { background: linear-gradient(90deg,transparent,#a78bfa,transparent); }
+.m-cell.c4::after { background: linear-gradient(90deg,transparent,#fbbf24,transparent); }
+.m-val {
+  font-family: var(--mono); font-size: 1.5rem; font-weight: 800;
+  letter-spacing: -0.03em; margin-bottom: 0.3rem;
+}
+.m-cell.c1 .m-val { color: #5eadf7; }
+.m-cell.c2 .m-val { color: #43d6c8; }
+.m-cell.c3 .m-val { color: #a78bfa; }
+.m-cell.c4 .m-val { color: #fbbf24; }
+.m-tag { font-size: 0.72rem; color: var(--text-2); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+
+/* ── INFO BANNER ── */
+.info-banner {
+  display: flex; align-items: flex-start; gap: 0.75rem;
+  background: rgba(99,179,237,0.05);
+  border: 1px solid rgba(99,179,237,0.15);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.2rem; margin-bottom: 2.5rem;
+  font-size: 0.85rem; color: var(--text-2); line-height: 1.55;
+}
+.info-banner strong { color: var(--text); }
+
+/* ── GRAPH GRID ── */
+.graphs-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.graph-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+  transition: all .25s;
+}
+.graph-card:hover { border-color: rgba(99,179,237,0.25); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.5); }
+.graph-card.full { grid-column: 1 / -1; }
+
+.graph-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 1.3rem; border-bottom: 1px solid var(--border);
+}
+.graph-header-left { display: flex; align-items: center; gap: 0.7rem; }
+.graph-icon {
+  width: 34px; height: 34px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.graph-title { font-size: 0.875rem; font-weight: 700; margin-bottom: 0.15rem; }
+.graph-sub { font-size: 0.74rem; color: var(--text-2); }
+.graph-badge {
+  font-size: 0.68rem; padding: 0.18rem 0.5rem;
+  border-radius: 5px; font-family: var(--mono);
+  font-weight: 600; flex-shrink: 0;
+}
+
+.graph-img {
+  width: 100%; display: block;
+  background: var(--surface);
+  transition: filter .25s;
+}
+.graph-card:hover .graph-img { filter: brightness(1.05); }
+
+/* color accents per card */
+.graph-card[data-type="trend"]    .graph-icon { background: rgba(99,179,237,0.1); }
+.graph-card[data-type="monthly"]  .graph-icon { background: rgba(104,211,145,0.1); }
+.graph-card[data-type="decomp"]   .graph-icon { background: rgba(246,173,85,0.1); }
+.graph-card[data-type="actual"]   .graph-icon { background: rgba(159,122,234,0.1); }
+.graph-card[data-type="error"]    .graph-icon { background: rgba(252,129,129,0.1); }
+.graph-card[data-type="forecast"] .graph-icon { background: rgba(79,209,197,0.1); }
+
+.graph-card[data-type="trend"]    .graph-badge { background: rgba(99,179,237,0.1); color: #5eadf7; border: 1px solid rgba(99,179,237,0.2); }
+.graph-card[data-type="monthly"]  .graph-badge { background: rgba(104,211,145,0.1); color: #6ee7b7; border: 1px solid rgba(104,211,145,0.2); }
+.graph-card[data-type="decomp"]   .graph-badge { background: rgba(246,173,85,0.1); color: #fbbf24; border: 1px solid rgba(246,173,85,0.2); }
+.graph-card[data-type="actual"]   .graph-badge { background: rgba(159,122,234,0.1); color: #a78bfa; border: 1px solid rgba(159,122,234,0.2); }
+.graph-card[data-type="error"]    .graph-badge { background: rgba(252,129,129,0.1); color: #f87171; border: 1px solid rgba(252,129,129,0.2); }
+.graph-card[data-type="forecast"] .graph-badge { background: rgba(79,209,197,0.1); color: #43d6c8; border: 1px solid rgba(79,209,197,0.2); }
+
+@media (max-width:768px) {
+  .graphs-grid { grid-template-columns: 1fr; }
+  .metrics-strip { grid-template-columns: 1fr 1fr; }
+  .graph-card.full { grid-column: 1; }
+}
+</style>
+{% endblock %}
+{% block content %}
+<div class="page">
+<svg style="position:fixed;top:80px;left:0;width:320px;height:320px;opacity:0.035;pointer-events:none;z-index:0;" viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg">
+  <rect x="20" y="180" width="30" height="120" rx="4" fill="#5eadf7"/>
+  <rect x="60" y="140" width="30" height="160" rx="4" fill="#a78bfa"/>
+  <rect x="100" y="160" width="30" height="140" rx="4" fill="#43d6c8"/>
+  <rect x="140" y="110" width="30" height="190" rx="4" fill="#5eadf7"/>
+  <rect x="180" y="90" width="30" height="210" rx="4" fill="#6ee7b7"/>
+  <rect x="220" y="70" width="30" height="230" rx="4" fill="#a78bfa"/>
+</svg>
+<div class="container">
+
+  <div class="page-header fade-up">
+    <div class="page-eyebrow"><div class="dot"></div>ARIMA Analysis</div>
+    <h1 class="page-title">Model <em>Performance</em> & Analytics</h1>
+    <p class="page-sub">Visual analysis of ARIMA model — sales trends, decomposition, and forecast accuracy</p>
+  </div>
+
+  <!-- METRICS -->
+  <div class="metrics-strip fade-up delay-1">
+    <div class="m-cell c1">
+      <div class="m-val">{{ metrics.MAE }}</div>
+      <div class="m-tag">MAE</div>
+    </div>
+    <div class="m-cell c2">
+      <div class="m-val">{{ metrics.RMSE }}</div>
+      <div class="m-tag">RMSE</div>
+    </div>
+    <div class="m-cell c3">
+      <div class="m-val">{{ metrics.MSE }}</div>
+      <div class="m-tag">MSE</div>
+    </div>
+    <div class="m-cell c4">
+      <div class="m-val">ARIMA</div>
+      <div class="m-tag">Model (5,1,0)</div>
+    </div>
+  </div>
+
+  <!-- INFO BANNER -->
+  <div class="info-banner fade-up delay-1">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10" stroke="#5eadf7" stroke-width="2"/><line x1="12" y1="8" x2="12" y2="12" stroke="#5eadf7" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="16" r="0.5" fill="#5eadf7" stroke="#5eadf7" stroke-width="2"/></svg>
+    All graphs generated from the <strong>Superstore Sales Dataset (2015–2018)</strong> containing 9,800 records.
+    ARIMA is trained on daily aggregated revenue using an 80% training / 20% testing split.
+  </div>
+
+  <!-- GRAPHS -->
+  <div class="graphs-grid fade-up delay-2">
+
+    <!-- Daily Sales Trend — Full -->
+    <div class="graph-card full" data-type="trend">
+      <div class="graph-header">
+        <div class="graph-header-left">
+          <div class="graph-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="#5eadf7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div>
+            <div class="graph-title">Daily Sales Trend</div>
+            <div class="graph-sub">Complete historical revenue from 2015 to 2018 — daily aggregated</div>
+          </div>
+        </div>
+        <div class="graph-badge">Time Series</div>
+      </div>
+      <img src="/static/graphs/sales_trend.png" class="graph-img" alt="Sales Trend"/>
+    </div>
+
+    <!-- Monthly Revenue — Full -->
+    <div class="graph-card full" data-type="monthly">
+      <div class="graph-header">
+        <div class="graph-header-left">
+          <div class="graph-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#6ee7b7" stroke-width="2"/><line x1="16" y1="2" x2="16" y2="6" stroke="#6ee7b7" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="2" x2="8" y2="6" stroke="#6ee7b7" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="10" x2="21" y2="10" stroke="#6ee7b7" stroke-width="2"/></svg>
+          </div>
+          <div>
+            <div class="graph-title">Monthly Total Revenue</div>
+            <div class="graph-sub">Aggregated monthly sales showing seasonal peaks and low periods</div>
+          </div>
+        </div>
+        <div class="graph-badge">Seasonal</div>
+      </div>
+      <img src="/static/graphs/monthly_revenue.png" class="graph-img" alt="Monthly Revenue"/>
+    </div>
+
+    <!-- Decomposition — Full -->
+    <div class="graph-card full" data-type="decomp">
+      <div class="graph-header">
+        <div class="graph-header-left">
+          <div class="graph-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="#fbbf24" stroke-width="2"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <div class="graph-title">Time Series Decomposition</div>
+            <div class="graph-sub">Breaking sales into: Observed · Trend · Seasonality · Residual noise</div>
+          </div>
+        </div>
+        <div class="graph-badge">Decomposition</div>
+      </div>
+      <img src="/static/graphs/decomposition.png" class="graph-img" alt="Decomposition"/>
+    </div>
+
+    <!-- Actual vs Predicted — Full -->
+    <div class="graph-card full" data-type="actual">
+      <div class="graph-header">
+        <div class="graph-header-left">
+          <div class="graph-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#a78bfa" stroke-width="2"/><polyline points="8 12 10.5 15 16 9" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div>
+            <div class="graph-title">Actual vs Predicted Sales</div>
+            <div class="graph-sub">ARIMA test set performance — predicted values against actual sales</div>
+          </div>
+        </div>
+        <div class="graph-badge">Validation</div>
+      </div>
+      <img src="/static/graphs/actual_vs_predicted.png" class="graph-img" alt="Actual vs Predicted"/>
+    </div>
+
+    <!-- Error Metrics — Half -->
+    <div class="graph-card" data-type="error">
+      <div class="graph-header">
+        <div class="graph-header-left">
+          <div class="graph-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M2 20h.01M7 20v-4M12 20v-8M17 20V8M22 4v16" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div>
+            <div class="graph-title">Error Metrics</div>
+            <div class="graph-sub">MAE and RMSE bar chart comparison</div>
+          </div>
+        </div>
+        <div class="graph-badge">Metrics</div>
+      </div>
+      <img src="/static/graphs/error_metrics.png" class="graph-img" alt="Error Metrics"/>
+    </div>
+
+    <!-- 30-Day Forecast — Half -->
+    <div class="graph-card" data-type="forecast">
+      <div class="graph-header">
+        <div class="graph-header-left">
+          <div class="graph-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" stroke="#43d6c8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div>
+            <div class="graph-title">30-Day Future Forecast</div>
+            <div class="graph-sub">ARIMA predicted sales with confidence band</div>
+          </div>
+        </div>
+        <div class="graph-badge">Forecast</div>
+      </div>
+      <img src="/static/graphs/forecast_future.png" class="graph-img" alt="30-Day Forecast"/>
+    </div>
+
+  </div>
+
+</div>
+</div>
+{% endblock %}

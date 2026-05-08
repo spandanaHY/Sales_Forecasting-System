@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+{% block title %}Create Account — SalesCast{% endblock %}
+{% block body_class %}bg-auth{% endblock %}
+{% block extra_style %}
+<style>
+.auth-root {
+  min-height: 100vh; display: flex;
+  background: transparent; overflow: hidden;
+}
+
+/* Right: LIGHT panel (form side) */
+.auth-right {
+  width: 490px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: 3rem 3.5rem;
+  background: #f0f4ff;
+  position: relative; overflow: hidden;
+  order: 2;
+}
+.auth-right::before {
+  content: ''; position: absolute; inset: 0;
+  background-image:
+    radial-gradient(circle at 80% 20%, rgba(167,139,250,0.07) 0%, transparent 50%),
+    radial-gradient(circle at 20% 80%, rgba(94,173,247,0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+.auth-right::after {
+  content: ''; position: absolute; inset: 0;
+  background-image: radial-gradient(rgba(167,139,250,0.1) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none; opacity: 0.5;
+}
+
+/* Left: DARK branding panel */
+.auth-left {
+  flex: 1; display: flex; flex-direction: column; justify-content: center;
+  padding: 4rem 5%;
+  background:
+    linear-gradient(135deg, rgba(4,6,15,0.78) 0%, rgba(10,14,26,0.72) 100%),
+    url("/static/img/bg-dashboard.jpg") center/cover no-repeat;
+  border-right: 1px solid rgba(167,139,250,0.1);
+  position: relative; overflow: hidden;
+  order: 1;
+}
+.auth-left::before {
+  content: ''; position: absolute; top: -100px; right: -100px;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(167,139,250,0.1) 0%, transparent 60%);
+  pointer-events: none;
+}
+.auth-left::after {
+  content: ''; position: absolute; bottom: -100px; left: -50px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(94,173,247,0.07) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.brand-logo { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 2.5rem; position:relative;z-index:1; }
+.brand-logo-icon {
+  width: 46px; height: 46px;
+  background: linear-gradient(135deg, #a78bfa, #5eadf7);
+  border-radius: 12px; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 24px rgba(167,139,250,0.4), 0 0 0 1px rgba(167,139,250,0.2);
+}
+.brand-name { font-size: 1.55rem; font-weight: 800; letter-spacing: -0.03em; font-family: var(--font-display); }
+.brand-name em { font-style: normal; color: var(--violet); }
+
+.brand-headline {
+  font-size: clamp(1.9rem, 3.5vw, 2.9rem); font-weight: 800;
+  letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 1rem;
+  position: relative; z-index: 1;
+  font-family: var(--font-display);
+}
+.brand-headline span {
+  background: linear-gradient(135deg, var(--violet), var(--teal));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.brand-desc { color: var(--text-2); font-size: 0.93rem; line-height: 1.65; max-width: 380px; margin-bottom: 2rem; position:relative;z-index:1; }
+
+.benefit-list { display: flex; flex-direction: column; gap: 0.9rem; position:relative;z-index:1; }
+.benefit-item { display: flex; align-items: flex-start; gap: 0.8rem; }
+.benefit-icon {
+  width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(8px);
+}
+.benefit-text-title { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.1rem; color: var(--text); }
+.benefit-text-sub { font-size: 0.79rem; color: var(--text-2); line-height: 1.5; }
+
+/* Light-theme form */
+.auth-form-wrap { width: 100%; position: relative; z-index: 1; }
+.auth-form-title { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 0.35rem; color: #0f172a; font-family: var(--font-display); }
+.auth-form-sub { color: #64748b; font-size: 0.87rem; margin-bottom: 2rem; line-height: 1.55; }
+
+.auth-right .form-group label { color: #475569; }
+.auth-right .form-group input {
+  background: #ffffff; border: 1.5px solid #e2e8f0; color: #0f172a;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.auth-right .form-group input:focus {
+  border-color: var(--violet); box-shadow: 0 0 0 3px rgba(167,139,250,0.12); background: #ffffff;
+}
+.auth-right .form-group input::placeholder { color: #94a3b8; }
+
+.input-group { position: relative; }
+.input-group svg { position: absolute; left: 0.9rem; top: 50%; transform: translateY(-50%); color: #94a3b8; pointer-events: none; }
+.input-group input { padding-left: 2.65rem; }
+
+.strength-row { display: flex; gap: 4px; margin-top: 0.5rem; }
+.strength-seg { flex: 1; height: 3px; border-radius: 3px; background: #e2e8f0; transition: background .3s; }
+
+.auth-right .btn-primary {
+  background: linear-gradient(135deg, var(--violet) 0%, var(--accent) 100%);
+  color: #fff; box-shadow: 0 4px 20px rgba(167,139,250,0.35);
+}
+.auth-right .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(167,139,250,0.5); }
+
+.btn-full { width: 100%; justify-content: center; padding: 0.85rem; font-size: 0.9rem; }
+.auth-switch { text-align: center; margin-top: 1.5rem; font-size: 0.85rem; color: #64748b; }
+.auth-switch a { color: var(--violet); text-decoration: none; font-weight: 600; }
+.auth-switch a:hover { text-decoration: underline; }
+.auth-right .alert-error { background: #fef2f2; border-color: #fecaca; color: #dc2626; }
+
+/* Decorative SVG network illustration */
+.auth-network-art {
+  position: absolute; bottom: 0; right: 0; width: 420px; opacity: 0.1; pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .auth-left { display: none; }
+  .auth-right { width: 100%; padding: 2rem 1.5rem; order: 1; }
+}
+</style>
+{% endblock %}
+{% block content %}
+<div class="auth-root">
+  <!-- Left dark panel -->
+  <div class="auth-left">
+    <div class="brand-logo fade-up">
+      <div class="brand-logo-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="brand-name">Sales<em>Cast</em></span>
+    </div>
+    <div class="brand-headline fade-up delay-1">
+      Start Forecasting<br/><span>in Minutes.</span>
+    </div>
+    <p class="brand-desc fade-up delay-2">
+      Create your free account and instantly access our ARIMA-powered sales forecasting engine with interactive dashboards.
+    </p>
+    <div class="benefit-list fade-up delay-3">
+      <div class="benefit-item">
+        <div class="benefit-icon" style="background:rgba(94,173,247,0.12);border:1px solid rgba(94,173,247,0.2);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" stroke="#5eadf7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <div class="benefit-text-title">Instant Forecasting</div>
+          <div class="benefit-text-sub">Generate up to 90-day predictions immediately after login</div>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon" style="background:rgba(110,231,183,0.1);border:1px solid rgba(110,231,183,0.2);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><line x1="18" y1="20" x2="18" y2="10" stroke="#6ee7b7" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="20" x2="12" y2="4" stroke="#6ee7b7" stroke-width="2" stroke-linecap="round"/><line x1="6" y1="20" x2="6" y2="14" stroke="#6ee7b7" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <div class="benefit-text-title">6 Visual Graphs</div>
+          <div class="benefit-text-sub">Trend, decomposition, actual vs predicted & more</div>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon" style="background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.2);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="#a78bfa" stroke-width="2"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <div class="benefit-text-title">ARIMA Model Metrics</div>
+          <div class="benefit-text-sub">Real-time MAE, RMSE, MSE, and MAPE evaluation</div>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon" style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.2);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 17l10 5 10-5" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12l10 5 10-5" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <div class="benefit-text-title">4 Years of Training Data</div>
+          <div class="benefit-text-sub">Model trained on 9,800+ retail sales records</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Decorative network nodes SVG -->
+    <svg class="auth-network-art" viewBox="0 0 420 380" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="80" cy="200" r="8" fill="rgba(94,173,247,0.8)"/>
+      <circle cx="180" cy="140" r="6" fill="rgba(167,139,250,0.8)"/>
+      <circle cx="280" cy="180" r="10" fill="rgba(67,214,200,0.8)"/>
+      <circle cx="350" cy="100" r="5" fill="rgba(94,173,247,0.6)"/>
+      <circle cx="160" cy="280" r="7" fill="rgba(251,191,36,0.7)"/>
+      <circle cx="320" cy="300" r="6" fill="rgba(167,139,250,0.6)"/>
+      <circle cx="60" cy="330" r="5" fill="rgba(110,231,183,0.7)"/>
+      <circle cx="240" cy="80" r="8" fill="rgba(94,173,247,0.7)"/>
+      <line x1="80" y1="200" x2="180" y2="140" stroke="rgba(94,173,247,0.4)" stroke-width="1.5"/>
+      <line x1="180" y1="140" x2="280" y2="180" stroke="rgba(167,139,250,0.4)" stroke-width="1.5"/>
+      <line x1="280" y1="180" x2="350" y2="100" stroke="rgba(67,214,200,0.4)" stroke-width="1.5"/>
+      <line x1="280" y1="180" x2="320" y2="300" stroke="rgba(167,139,250,0.3)" stroke-width="1"/>
+      <line x1="80" y1="200" x2="160" y2="280" stroke="rgba(94,173,247,0.3)" stroke-width="1"/>
+      <line x1="160" y1="280" x2="320" y2="300" stroke="rgba(251,191,36,0.3)" stroke-width="1"/>
+      <line x1="60" y1="330" x2="160" y2="280" stroke="rgba(110,231,183,0.3)" stroke-width="1"/>
+      <line x1="180" y1="140" x2="240" y2="80" stroke="rgba(94,173,247,0.3)" stroke-width="1"/>
+      <line x1="240" y1="80" x2="350" y2="100" stroke="rgba(167,139,250,0.3)" stroke-width="1"/>
+    </svg>
+  </div>
+
+  <!-- Right light form panel -->
+  <div class="auth-right">
+    <div class="auth-form-wrap fade-up">
+      <div class="auth-form-title">Create account</div>
+      <div class="auth-form-sub">Join SalesCast and start predicting sales</div>
+
+      {% if error %}
+      <div class="alert alert-error">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="16" r="0.5" fill="currentColor" stroke="currentColor" stroke-width="2"/></svg>
+        {{ error }}
+      </div>
+      {% endif %}
+
+      <form method="POST" action="/register">
+        <div class="form-group">
+          <label>Full Name</label>
+          <div class="input-group">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <input type="text" name="username" placeholder="Your full name" required/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <div class="input-group">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2"/><polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="2"/></svg>
+            <input type="email" name="email" placeholder="you@example.com" required/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-group">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <input type="password" name="password" id="pw" placeholder="Create a strong password" required/>
+          </div>
+          <div class="strength-row">
+            <div class="strength-seg" id="s1"></div>
+            <div class="strength-seg" id="s2"></div>
+            <div class="strength-seg" id="s3"></div>
+            <div class="strength-seg" id="s4"></div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full" style="margin-top:1rem;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="8.5" cy="7" r="4" stroke="currentColor" stroke-width="2"/><line x1="20" y1="8" x2="20" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="23" y1="11" x2="17" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Create Account
+        </button>
+      </form>
+      <div class="auth-switch">Already have an account? <a href="/login">Sign in</a></div>
+    </div>
+  </div>
+</div>
+<script>
+const pw = document.getElementById('pw');
+const segs = ['s1','s2','s3','s4'].map(id => document.getElementById(id));
+const colors = ['#f87171','#fbbf24','#5eadf7','#6ee7b7'];
+pw.addEventListener('input', function() {
+  const l = this.value.length;
+  const level = l < 4 ? 1 : l < 7 ? 2 : l < 10 ? 3 : 4;
+  segs.forEach((s,i) => { s.style.background = i < level ? colors[level-1] : '#e2e8f0'; });
+});
+</script>
+{% endblock %}
